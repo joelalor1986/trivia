@@ -1,4 +1,7 @@
+import APIKEY from "./apikey.js";
 const urlAPI = "https://opentdb.com/api.php?amount=10"
+
+const url = 'https://translation.googleapis.com/language/translate/v2';
 
 const $ = selector => document.querySelector(selector);
 let trivias = null;
@@ -18,6 +21,21 @@ $("#btnIniciar").addEventListener("click", function (e) {
         let modal = new bootstrap.Modal($("#contenedorTrivia"), {
             keyboard: false
         })
+        /*  fetch(url, {
+             method: 'POST',
+             headers: {
+                 'Content-Type': 'application/json',
+                 'Authorization': `Bearer ${APIKEY}`
+             },
+             body: JSON.stringify(data.results[contadores.indicePregunta].question)
+         })
+             .then(response2 => response2.json())
+             .then(response2 => {
+                 console.log(response2.data.translations[0].translatedText);
+             })
+             .catch(error => {
+                 console.error(error);
+             }); */
         modal.show();
         trivias = data.results;
         contadores.contadorAciertos = 0;
@@ -68,15 +86,16 @@ $("#triviaPreguntas").addEventListener("click", e => {
     if (e.target.classList.contains("btn")) {
         if (contadores.indicePregunta < 10) {
             const respuesta = e.target.dataset.answer;
-            console.log(trivias[contadores.indicePregunta].correct_answer + "  " + respuesta)
-            if (trivias[contadores.indicePregunta].correct_answer == respuesta) {
+            const respuestaCorrecta = htmlDecode(trivias[contadores.indicePregunta].correct_answer);
+            //console.log(respuestaCorrecta + "  " + respuesta + " " + trivias[contadores.indicePregunta].correct_answer);
+            if (respuestaCorrecta == respuesta) {
                 contadores.contadorAciertos++;
                 $("#footerModal").innerHTML = `
                     <p class="text-bg-success p-3">Respuesta correcta: ${trivias[contadores.indicePregunta].correct_answer}</p>
                 `
             } else {
                 $("#footerModal").innerHTML = `
-                    <p class="text-bg-danger p-3">Error respuesta correcta: ${trivias[contadores.indicePregunta].correct_answer}</p>
+                    <p class="text-bg-danger p-3">Respuesta correcta: ${trivias[contadores.indicePregunta].correct_answer}</p>
                 `
             }
             contadores.indicePregunta++;
@@ -86,3 +105,7 @@ $("#triviaPreguntas").addEventListener("click", e => {
 
     }
 })
+function htmlDecode(input) {
+    var doc = new DOMParser().parseFromString(input, "text/html");
+    return doc.documentElement.textContent;
+}
